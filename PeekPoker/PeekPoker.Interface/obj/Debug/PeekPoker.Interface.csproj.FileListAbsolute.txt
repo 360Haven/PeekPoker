@@ -1,0 +1,12 @@
+C:\Users\Ola\Desktop\Dropbox\Programming\CSharp\Win Form\PeekPoker\PeekPoker\PeekPoker.Interface\bin\Debug\PeekPoker.Interface.XML
+C:\Users\Ola\Desktop\Dropbox\Programming\CSharp\Win Form\PeekPoker\PeekPoker\PeekPoker.Interface\bin\Debug\PeekPoker.Interface.dll
+C:\Users\Ola\Desktop\Dropbox\Programming\CSharp\Win Form\PeekPoker\PeekPoker\PeekPoker.Interface\bin\Debug\PeekPoker.Interface.pdb
+C:\Users\Ola\Desktop\Dropbox\Programming\CSharp\Win Form\PeekPoker\PeekPoker\PeekPoker.Interface\obj\Debug\PeekPoker.Interface.csprojResolveAssemblyReference.cache
+C:\Users\Ola\Desktop\Dropbox\Programming\CSharp\Win Form\PeekPoker\PeekPoker\PeekPoker.Interface\obj\Debug\PeekPoker.Interface.dll
+C:\Users\Ola\Desktop\Dropbox\Programming\CSharp\Win Form\PeekPoker\PeekPoker\PeekPoker.Interface\obj\Debug\PeekPoker.Interface.pdb
+C:\Users\Ola\Documents\GitHub\PeekPoker\PeekPoker\PeekPoker.Interface\bin\Debug\PeekPoker.Interface.XML
+C:\Users\Ola\Documents\GitHub\PeekPoker\PeekPoker\PeekPoker.Interface\bin\Debug\PeekPoker.Interface.dll
+C:\Users\Ola\Documents\GitHub\PeekPoker\PeekPoker\PeekPoker.Interface\bin\Debug\PeekPoker.Interface.pdb
+C:\Users\Ola\Documents\GitHub\PeekPoker\PeekPoker\PeekPoker.Interface\obj\Debug\PeekPoker.Interface.csprojResolveAssemblyReference.cache
+C:\Users\Ola\Documents\GitHub\PeekPoker\PeekPoker\PeekPoker.Interface\obj\Debug\PeekPoker.Interface.dll
+C:\Users\Ola\Documents\GitHub\PeekPoker\PeekPoker\PeekPoker.Interface\obj\Debug\PeekPoker.Interface.pdb
