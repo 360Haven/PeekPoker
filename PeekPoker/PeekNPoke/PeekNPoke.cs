@@ -5,7 +5,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Be.Windows.Forms;
 using PeekPoker.Interface;
-
+using Be;
 namespace PeekPoker.PeekNPoke
 {
     public partial class PeekNPoke : Form
@@ -248,7 +248,11 @@ namespace PeekPoker.PeekNPoke
         private void ChangeNumericValue()
         {
             if (hexBox.ByteProvider == null) return;
-            List<byte> buffer = hexBox.ByteProvider.Bytes;
+            List<byte> buffer = new List<byte>();
+            for (int i = 0; i < hexBox.ByteProvider.Length; i++)
+            {
+                buffer.Add(hexBox.ByteProvider.ReadByte(i));
+            }
             if (isSigned.Checked)
             {
                 NumericInt8.Value = (buffer.Count - hexBox.SelectionStart) > 0
@@ -296,7 +300,7 @@ namespace PeekPoker.PeekNPoke
 
         private void ChangedNumericValue(object numfield)
         {
-            if (hexBox.SelectionStart >= hexBox.ByteProvider.Bytes.Count) return;
+            if (hexBox.SelectionStart >= hexBox.ByteProvider.Length) return;
             if (numfield.GetType() == typeof (NumericUpDown))
             {
                 var numeric = (NumericUpDown) numfield;
@@ -423,8 +427,7 @@ namespace PeekPoker.PeekNPoke
                                                           GetTextBoxText(peekLengthTextBox),
                                                           GetTextBoxText(peekPokeAddressTextBox),
                                                           GetTextBoxText(peekLengthTextBox)));
-                var buffer = new DynamicByteProvider(retValue) {IsWriteByte = true}; //object initilizer
-
+                var buffer = new DynamicByteProvider(retValue); //object initilizer
                 _old = new byte[buffer.Bytes.Count];
                 buffer.Bytes.CopyTo(_old);
 

@@ -366,8 +366,9 @@ namespace PeekPoker.PeekNPoke
             // 
             // 
             this.hexBox.BuiltInContextMenu.CopyMenuItemText = "";
+            this.hexBox.ColumnInfoVisible = true;
             this.hexBox.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.hexBox.LineInfoForeColor = System.Drawing.Color.Empty;
+            this.hexBox.InfoForeColor = System.Drawing.Color.Empty;
             this.hexBox.LineInfoVisible = true;
             this.hexBox.Location = new System.Drawing.Point(2, 97);
             this.hexBox.Name = "hexBox";

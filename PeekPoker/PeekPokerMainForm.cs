@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -15,18 +16,11 @@ namespace PeekPoker
 {
     public partial class PeekPokerMainForm : Form
     {
-        #region global varibales
-
-        private List<ListViewItem> _listviewItem;
-        private PluginService _pluginService;
-        private RealTimeMemory _rtm; //DLL is now in the Important File Folder
-
-        #endregion global varibales
-
         public PeekPokerMainForm()
         {
             InitializeComponent();
-            LoadPlugins();
+            Text = string.Format("Peek Poker - Version {0}",Assembly.GetExecutingAssembly().GetName().Version);
+           LoadPlugins();
         }
 
         private void MainFormFormClosing(object sender, FormClosingEventArgs e)
@@ -35,16 +29,16 @@ namespace PeekPoker
             Process.GetCurrentProcess().Kill(); //Immediately stop the process
         }
 
-        private void Form1Load(Object sender, EventArgs e)
+        private void Form1Load(object sender, EventArgs e)
         {
             try
             {
-                string ip = "";
+                var ip = "";
 
-                string filePath = AppDomain.CurrentDomain.BaseDirectory + "config.ini";
+                var filePath = AppDomain.CurrentDomain.BaseDirectory + "config.ini";
                 if (!(File.Exists(filePath)))
                 {
-                    using (FileStream str = File.Create(filePath))
+                    using (var str = File.Create(filePath))
                     {
                         str.Close();
                     }
@@ -70,231 +64,6 @@ namespace PeekPoker
                 ShowMessageBox(ex.Message, "Peek Poker", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        #region button clicks
-
-        private void showHideOptionsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (optionPanel.Visible)
-                optionPanel.Hide();
-            else
-                optionPanel.Show();
-        }
-
-        private void showHidePluginsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (pluginPanel.Visible)
-                pluginPanel.Hide();
-            else
-                pluginPanel.Show();
-        }
-
-        private void AboutToolStripMenuItem1Click(object sender, EventArgs e)
-        {
-            var aboutBox = new AboutBox();
-            aboutBox.ShowDialog(this);
-        }
-
-        //The click handler for the plugins
-        private void PluginClickEventHandler(object sender, EventArgs e)
-        {
-            try
-            {
-                var item = (Button) sender; // get the menu item
-                foreach (AbstractPlugin plugin in _pluginService.PluginDatas)
-                {
-                    if (plugin.ApplicationName != item.Name) continue;
-
-                    //Setting Values
-                    plugin.APRtm = _rtm;
-                    plugin.IsMdiChild = !displayOutsideParentBox.Checked;
-                    plugin.APShowMessageBox += ShowMessageBox;
-                    plugin.APEnableControl += EnableControl;
-                    plugin.APUpdateProgressBar += UpdateProgressbar;
-                    plugin.APGetTextBoxText += GetTextBoxText;
-                    plugin.APSetTextBoxText += SetTextBoxText;
-                    plugin.Display(this);
-                }
-                foreach (AbstractPlugin plugin in _pluginService.OptionPluginDatas)
-                {
-                    if (plugin.ApplicationName != item.Name) continue;
-
-                    //Setting Values
-                    plugin.APRtm = _rtm;
-                    plugin.IsMdiChild = !displayOutsideParentBox.Checked;
-                    plugin.APShowMessageBox += ShowMessageBox;
-                    plugin.APEnableControl += EnableControl;
-                    plugin.APUpdateProgressBar += UpdateProgressbar;
-                    plugin.APGetTextBoxText += GetTextBoxText;
-                    plugin.APSetTextBoxText += SetTextBoxText;
-                    plugin.Display(this);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        //When you click on the connect button
-        private void ConnectButtonClick(object sender, EventArgs e)
-        {
-            ThreadPool.QueueUserWorkItem(Connect);
-        }
-
-        private void ipAddressTextBox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == (char) 13)
-                ThreadPool.QueueUserWorkItem(Connect);
-        }
-
-        //When you click on the www.360haven.com
-        private void ToolStripStatusLabel2Click(object sender, EventArgs e)
-        {
-            Process.Start("www.360haven.com");
-        }
-
-        private void peekNpokeButton_Click(object sender, EventArgs e)
-        {
-            PeekNPoke.PeekNPoke form = displayOutsideParentBox.Checked
-                                           ? new PeekNPoke.PeekNPoke(_rtm)
-                                           : new PeekNPoke.PeekNPoke(_rtm) {MdiParent = this};
-            form.ShowMessageBox += ShowMessageBox;
-            form.UpdateProgressbar += UpdateProgressbar;
-            form.EnableControl += EnableControl;
-            form.GetTextBoxText += GetTextBoxText;
-            form.SetTextBoxText += SetTextBoxText;
-            form.Show();
-        }
-
-        private void dumpButton_Click(object sender, EventArgs e)
-        {
-            Dump.Dump form = displayOutsideParentBox.Checked
-                                 ? new Dump.Dump(_rtm)
-                                 : new Dump.Dump(_rtm) {MdiParent = this};
-            form.ShowMessageBox += ShowMessageBox;
-            form.EnableControl += EnableControl;
-            form.GetTextBoxText += GetTextBoxText;
-            form.UpdateProgressbar += UpdateProgressbar;
-            form.Show();
-        }
-
-        private void SearchButtonClick(object sender, EventArgs e)
-        {
-            Search.Search form = displayOutsideParentBox.Checked
-                                     ? new Search.Search(_rtm)
-                                     : new Search.Search(_rtm) {MdiParent = this};
-            form.ShowMessageBox += ShowMessageBox;
-            form.EnableControl += EnableControl;
-            form.GetTextBoxText += GetTextBoxText;
-            form.UpdateProgressbar += UpdateProgressbar;
-            form.Show();
-        }
-
-        private void pluginInfoButton_Click(object sender, EventArgs e)
-        {
-            PluginInfo.PluginInfo form = displayOutsideParentBox.Checked
-                                             ? new PluginInfo.PluginInfo(_listviewItem)
-                                             : new PluginInfo.PluginInfo(_listviewItem) {MdiParent = this};
-            form.Show();
-        }
-
-        #endregion button clicks
-
-        #region Functions
-
-        private void LoadPlugins()
-        {
-            try
-            {
-                string pathToPlugins = AppDomain.CurrentDomain.BaseDirectory + "Plugins";
-                if (!(Directory.Exists(pathToPlugins))) Directory.CreateDirectory(pathToPlugins);
-
-                _pluginService = new PluginService(pathToPlugins);
-                _listviewItem = new List<ListViewItem>(_pluginService.PluginDatas.Count);
-
-                foreach (AbstractPlugin pluginData in _pluginService.PluginDatas)
-                {
-                    EnableControl(pluginInfoButton, true);
-                    var item = new Button
-                                   {
-                                       Name = pluginData.ApplicationName,
-                                       Tag = pluginData.ApplicationName,
-                                       Text = pluginData.ApplicationName,
-                                       Image = pluginData.Icon.ToBitmap(),
-                                       Size = new Size(108, 75),
-                                       ImageAlign = ContentAlignment.TopCenter,
-                                       MaximumSize = new Size(108, 75),
-                                       Dock = DockStyle.Left,
-                                       TextAlign = ContentAlignment.BottomCenter,
-                                   };
-                    item.Click += PluginClickEventHandler;
-                    pluginPanel.Controls.Add(item);
-
-                    //Plugin Details
-                    var listviewItem = new ListViewItem(pluginData.ApplicationName);
-                    listviewItem.SubItems.Add(pluginData.Description);
-                    listviewItem.SubItems.Add(pluginData.Author);
-                    listviewItem.SubItems.Add(pluginData.Version);
-                    _listviewItem.Add(listviewItem);
-                }
-
-                //Load Options
-                foreach (AbstractPlugin pluginData in _pluginService.OptionPluginDatas)
-                {
-                    var item = new Button
-                                   {
-                                       Name = pluginData.ApplicationName,
-                                       Tag = pluginData.ApplicationName,
-                                       Text = pluginData.ApplicationName,
-                                       Size = new Size(187, 33),
-                                       MaximumSize = new Size(187, 33),
-                                       Dock = DockStyle.Top,
-                                       TextAlign = ContentAlignment.MiddleCenter,
-                                   };
-                    item.Click += PluginClickEventHandler;
-                    mainGroupBox.Controls.Add(item);
-                    MinimumSize = new Size(MinimumSize.Width, MinimumSize.Height + 33);
-                    //Plugin Details
-                    var listviewItem = new ListViewItem(pluginData.ApplicationName);
-                    listviewItem.SubItems.Add(pluginData.Description);
-                    listviewItem.SubItems.Add(pluginData.Author);
-                    listviewItem.SubItems.Add(pluginData.Version);
-                    _listviewItem.Add(listviewItem);
-                }
-            }
-            catch (Exception e)
-            {
-                ShowMessageBox(e.Message, "Peek Poker", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void Save()
-        {
-            string ipAddress = GetTextBoxText(ipAddressTextBox);
-            string filePath = AppDomain.CurrentDomain.BaseDirectory + "config.ini";
-            if (!(File.Exists(filePath)))
-            {
-                using (FileStream str = File.Create(filePath))
-                {
-                    str.Close();
-                }
-            }
-
-            var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine("#License#");
-            stringBuilder.AppendLine("Accept");
-            stringBuilder.AppendLine("#IP#");
-            stringBuilder.AppendLine(ipAddress);
-
-            string line = stringBuilder.ToString();
-            using (var file = new StreamWriter(filePath))
-            {
-                file.Write(line);
-            }
-        }
-
-        #endregion Functions
 
         #region Thread Functions
 
@@ -336,12 +105,247 @@ namespace PeekPoker
             }
             catch (Exception ex)
             {
-                ShowMessageBox(ex.Message, String.Format("Peek Poker"), MessageBoxButtons.OK,
-                               MessageBoxIcon.Error);
+                ShowMessageBox(ex.Message, "Peek Poker", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
         #endregion Thread Functions
+
+        #region global varibales
+
+        private List<ListViewItem> _listviewItem;
+        private PluginService _pluginService;
+        private RealTimeMemory _rtm; //DLL is now in the Important File Folder
+
+        #endregion global varibales
+
+        #region button clicks
+
+        private void showHideOptionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (optionPanel.Visible)
+                optionPanel.Hide();
+            else
+                optionPanel.Show();
+            toggleoptions.Checked = !toggleoptions.Checked;
+        }
+
+        private void showHidePluginsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (pluginPanel.Visible)
+                pluginPanel.Hide();
+            else
+                pluginPanel.Show();
+            toggleplugins.Checked = !toggleplugins.Checked;
+        }
+
+        private void AboutToolStripMenuItem1Click(object sender, EventArgs e)
+        {
+            var aboutBox = new AboutBox();
+            aboutBox.ShowDialog(this);
+        }
+
+        //The click handler for the plugins
+        private void PluginClickEventHandler(object sender, EventArgs e)
+        {
+            try
+            {
+                var item = (Button) sender; // get the menu item
+                foreach (var plugin in _pluginService.PluginDatas)
+                {
+                    if (plugin.ApplicationName != item.Name) continue;
+
+                    //Setting Values
+                    plugin.APRtm = _rtm;
+                    plugin.IsMdiChild = !displayOutsideParentBox.Checked;
+                    plugin.APShowMessageBox += ShowMessageBox;
+                    plugin.APEnableControl += EnableControl;
+                    plugin.APUpdateProgressBar += UpdateProgressbar;
+                    plugin.APGetTextBoxText += GetTextBoxText;
+                    plugin.APSetTextBoxText += SetTextBoxText;
+                    plugin.Display(this);
+                }
+                foreach (var plugin in _pluginService.OptionPluginDatas)
+                {
+                    if (plugin.ApplicationName != item.Name) continue;
+
+                    //Setting Values
+                    plugin.APRtm = _rtm;
+                    plugin.IsMdiChild = !displayOutsideParentBox.Checked;
+                    plugin.APShowMessageBox += ShowMessageBox;
+                    plugin.APEnableControl += EnableControl;
+                    plugin.APUpdateProgressBar += UpdateProgressbar;
+                    plugin.APGetTextBoxText += GetTextBoxText;
+                    plugin.APSetTextBoxText += SetTextBoxText;
+                    plugin.Display(this);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        //When you click on the connect button
+        private void ConnectButtonClick(object sender, EventArgs e)
+        {
+            ThreadPool.QueueUserWorkItem(Connect);
+        }
+
+        private void ipAddressTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char) 13)
+                ThreadPool.QueueUserWorkItem(Connect);
+        }
+
+        //When you click on the www.360haven.com
+        private void ToolStripStatusLabel2Click(object sender, EventArgs e)
+        {
+            Process.Start("www.360haven.com");
+        }
+
+        private void peekNpokeButton_Click(object sender, EventArgs e)
+        {
+            var form = displayOutsideParentBox.Checked
+                ? new PeekNPoke.PeekNPoke(_rtm)
+                : new PeekNPoke.PeekNPoke(_rtm) {MdiParent = this};
+            form.ShowMessageBox += ShowMessageBox;
+            form.UpdateProgressbar += UpdateProgressbar;
+            form.EnableControl += EnableControl;
+            form.GetTextBoxText += GetTextBoxText;
+            form.SetTextBoxText += SetTextBoxText;
+            form.Show();
+        }
+
+        private void dumpButton_Click(object sender, EventArgs e)
+        {
+            var form = displayOutsideParentBox.Checked
+                ? new Dump.Dump(_rtm)
+                : new Dump.Dump(_rtm) {MdiParent = this};
+            form.ShowMessageBox += ShowMessageBox;
+            form.EnableControl += EnableControl;
+            form.GetTextBoxText += GetTextBoxText;
+            form.UpdateProgressbar += UpdateProgressbar;
+            form.Show();
+        }
+
+        private void SearchButtonClick(object sender, EventArgs e)
+        {
+            var form = displayOutsideParentBox.Checked
+                ? new Search.Search(_rtm)
+                : new Search.Search(_rtm) {MdiParent = this};
+            form.ShowMessageBox += ShowMessageBox;
+            form.EnableControl += EnableControl;
+            form.GetTextBoxText += GetTextBoxText;
+            form.UpdateProgressbar += UpdateProgressbar;
+            form.Show();
+        }
+
+        private void pluginInfoButton_Click(object sender, EventArgs e)
+        {
+            var form = displayOutsideParentBox.Checked
+                ? new PluginInfo.PluginInfo(_listviewItem)
+                : new PluginInfo.PluginInfo(_listviewItem) {MdiParent = this};
+            form.Show();
+        }
+
+        #endregion button clicks
+
+        #region Functions
+
+        private void LoadPlugins()
+        {
+            try
+            {
+                var pathToPlugins = AppDomain.CurrentDomain.BaseDirectory + "Plugins";
+                if (!(Directory.Exists(pathToPlugins))) Directory.CreateDirectory(pathToPlugins);
+
+                _pluginService = new PluginService(pathToPlugins);
+                _listviewItem = new List<ListViewItem>(_pluginService.PluginDatas.Count);
+
+                foreach (var pluginData in _pluginService.PluginDatas)
+                {
+                    EnableControl(pluginInfoButton, true);
+                    var item = new Button
+                    {
+                        Name = pluginData.ApplicationName,
+                        Tag = pluginData.ApplicationName,
+                        Text = pluginData.ApplicationName,
+                        Image = pluginData.Icon.ToBitmap(),
+                        Size = new Size(108, 75),
+                        ImageAlign = ContentAlignment.TopCenter,
+                        MaximumSize = new Size(108, 75),
+                        Dock = DockStyle.Left,
+                        TextAlign = ContentAlignment.BottomCenter
+                    };
+                    item.Click += PluginClickEventHandler;
+                    pluginPanel.Controls.Add(item);
+
+                    //Plugin Details
+                    var listviewItem = new ListViewItem(pluginData.ApplicationName);
+                    listviewItem.SubItems.Add(pluginData.Description);
+                    listviewItem.SubItems.Add(pluginData.Author);
+                    listviewItem.SubItems.Add(pluginData.Version);
+                    _listviewItem.Add(listviewItem);
+                }
+
+                //Load Options
+                foreach (var pluginData in _pluginService.OptionPluginDatas)
+                {
+                    var item = new Button
+                    {
+                        Name = pluginData.ApplicationName,
+                        Tag = pluginData.ApplicationName,
+                        Text = pluginData.ApplicationName,
+                        Size = new Size(187, 33),
+                        MaximumSize = new Size(187, 33),
+                        Dock = DockStyle.Top,
+                        TextAlign = ContentAlignment.MiddleCenter
+                    };
+                    item.Click += PluginClickEventHandler;
+                    mainGroupBox.Controls.Add(item);
+                    MinimumSize = new Size(MinimumSize.Width, MinimumSize.Height + 33);
+                    //Plugin Details
+                    var listviewItem = new ListViewItem(pluginData.ApplicationName);
+                    listviewItem.SubItems.Add(pluginData.Description);
+                    listviewItem.SubItems.Add(pluginData.Author);
+                    listviewItem.SubItems.Add(pluginData.Version);
+                    _listviewItem.Add(listviewItem);
+                }
+            }
+            catch (Exception e)
+            {
+                ShowMessageBox(e.Message, "Peek Poker", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void Save()
+        {
+            var ipAddress = GetTextBoxText(ipAddressTextBox);
+            var filePath = AppDomain.CurrentDomain.BaseDirectory + "config.ini";
+            if (!(File.Exists(filePath)))
+            {
+                using (var str = File.Create(filePath))
+                {
+                    str.Close();
+                }
+            }
+
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine("#License#");
+            stringBuilder.AppendLine("Accept");
+            stringBuilder.AppendLine("#IP#");
+            stringBuilder.AppendLine(ipAddress);
+
+            var line = stringBuilder.ToString();
+            using (var file = new StreamWriter(filePath))
+            {
+                file.Write(line);
+            }
+        }
+
+        #endregion Functions
 
         #region safeThreadingProperties
 
@@ -349,10 +353,10 @@ namespace PeekPoker
         private string GetTextBoxText(Control control)
         {
             //recursion
-            string returnVal = "";
+            var returnVal = "";
             if (control.InvokeRequired)
                 control.Invoke((MethodInvoker)
-                               delegate { returnVal = GetTextBoxText(control); });
+                    delegate { returnVal = GetTextBoxText(control); });
             else
                 return control.Text;
             return returnVal;

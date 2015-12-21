@@ -10,3 +10,9 @@ C:\Users\Ola\Documents\GitHub\PeekPoker\PeekPoker\PeekPoker.Interface\bin\Debug\
 C:\Users\Ola\Documents\GitHub\PeekPoker\PeekPoker\PeekPoker.Interface\obj\Debug\PeekPoker.Interface.csprojResolveAssemblyReference.cache
 C:\Users\Ola\Documents\GitHub\PeekPoker\PeekPoker\PeekPoker.Interface\obj\Debug\PeekPoker.Interface.dll
 C:\Users\Ola\Documents\GitHub\PeekPoker\PeekPoker\PeekPoker.Interface\obj\Debug\PeekPoker.Interface.pdb
+C:\Users\M\Documents\GitHub\PeekPoker\PeekPoker\PeekPoker.Interface\bin\Debug\PeekPoker.Interface.XML
+C:\Users\M\Documents\GitHub\PeekPoker\PeekPoker\PeekPoker.Interface\bin\Debug\PeekPoker.Interface.dll
+C:\Users\M\Documents\GitHub\PeekPoker\PeekPoker\PeekPoker.Interface\bin\Debug\PeekPoker.Interface.pdb
+C:\Users\M\Documents\GitHub\PeekPoker\PeekPoker\PeekPoker.Interface\obj\Debug\PeekPoker.Interface.csprojResolveAssemblyReference.cache
+C:\Users\M\Documents\GitHub\PeekPoker\PeekPoker\PeekPoker.Interface\obj\Debug\PeekPoker.Interface.dll
+C:\Users\M\Documents\GitHub\PeekPoker\PeekPoker\PeekPoker.Interface\obj\Debug\PeekPoker.Interface.pdb

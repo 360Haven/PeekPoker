@@ -13,7 +13,7 @@ namespace PeekPoker.About
         {
             InitializeComponent();
             var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine(string.Format("Peek Poker - Open Source Memory Editor"));
+            stringBuilder.AppendLine(string.Format("Peek Poker - Open Source Xbox360 Memory Editor"));
             stringBuilder.AppendLine(string.Format("Cybersam, 8Ball, PureIso, Jappi88"));
             stringBuilder.AppendLine(string.Format("Fairchild (Committer)"));
             stringBuilder.AppendLine(string.Format("Mojobojo (Committer)"));
@@ -27,7 +27,7 @@ namespace PeekPoker.About
 
             Text = String.Format("About {0}", AssemblyTitle);
             labelProductName.Text = "PeekPoker";
-            labelVersion.Text = String.Format("Version {0}", AssemblyVersion + " " + "Revision 8");
+            labelVersion.Text = String.Format("Version {0}", AssemblyVersion);
             labelCopyright.Text = "GNU GPL v3";
             textBoxDescription.Text = stringBuilder.ToString();
         }
